@@ -144,6 +144,10 @@ class plane_COBOT:
         self.Link_4.plot(ax, **kwargs)
         self.Link_5.plot(ax, **kwargs)
 
+    def PGI(self, des_pose=[2,0,-np.pi/4]):
+        des_pose = np.array(des_pose)
+
+
 
 class MatplotlibWidget(QMainWindow):
 
@@ -155,6 +159,7 @@ class MatplotlibWidget(QMainWindow):
 
         self.setWindowTitle("PyQt5 & Matplotlib Example GUI")
         self.addToolBar(NavigationToolbar(self.MplWidget.canvas, self))
+        # Setting the default values
         # Adding code to plug the stuff
         self.T1_Value_Box.editingFinished.connect(lambda: self.set_slider_pos(self.T1_Value_Box.value(), self.T1_Slider))
         self.T2_Value_Box.editingFinished.connect(lambda: self.set_slider_pos(self.T2_Value_Box.value(), self.T2_Slider))
