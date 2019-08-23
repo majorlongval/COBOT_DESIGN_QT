@@ -76,6 +76,54 @@ class plane_COBOT:
         p = p3 + (self.L4*e3)
         return [p1, p2, p3, p]
 
+    def PGI(self, pos, sol=1):
+        """This function calculates the angle values for a given pose
+        of the end effector. The pos is given by an array(list) of
+        three values [x, y, phi]. The first two values are expressed
+        with respect to the base of the robot and the last value is
+        expressed with respect to the x axis. The last value must
+        be in rad.
+
+        There are two solutions to the problem so that the user must
+        choose one of the two options. If no options are given, the
+        solution with the largest sin(theta1) value is taken. In this
+        position, the robot is as high as possible.
+        """
+        # Defining constants used in the solution of the PGI
+        l1 = self.L1
+        l2 = self.L3-self.L2
+        l3 = self.L4
+        x = pos[0]
+        y = pos[1]
+        phi = pos[2]
+        A = 2*l1*(l3*np.cos(phi)-x)
+        B = 2*l1*(l3*np.sin(phi)-y)
+        C = x**2+y**2+l1**2+l3**2-l2**2-2*l3*(x*np.cos(phi)+y*np.sin(phi))
+
+        U = C-A
+        V = 2*B
+        W = A+C
+
+        # Calculing the two solutions for theta1
+        args = np.roots([U, V, W])
+        print(args)
+        theta11 = 2*np.arctan(args[0])
+        theta12 = 2*np.arctan(args[1])
+        if sol == 1:
+            theta1 = theta11
+        else:
+            theta1 = theta12
+
+        # Calculating the solution for theta2
+        arg1 = (pos[1] - l1*np.sin(theta1) - l3*np.sin(pos[2]))/l2
+        arg2 = (pos[0] - l1*np.cos(theta1) - l3*np.cos(pos[2]))/l2
+        theta2 = np.arctan2(arg1, arg2)
+
+        # Calculating the solution for theta3
+        theta3 = pos[2]-theta1-theta2
+
+        return([theta1, theta2, theta3])
+
     def update(self):
         self.PGDp = self.PGD()
         self.Link_1 = cst_plane_Robot_Link(ip=np.array(self.bp),
@@ -122,6 +170,7 @@ class MatplotlibWidget(QMainWindow):
         self.L3_Value_Box.valueChanged.connect(lambda: self.update_cobot(L3=self.L3_Value_Box.value()))
         self.L4_Value_Box.valueChanged.connect(lambda: self.update_cobot(L4=self.L4_Value_Box.value()))
         self.cobot = plane_COBOT()
+        print(self.cobot.PGI([1, 0, 0], 2))
 
     def set_slider_pos(self, ang_pos, slider):
         rel_pos = ((slider.maximum()-slider.minimum())/(2*np.pi))*ang_pos
