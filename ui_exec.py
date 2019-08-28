@@ -144,10 +144,6 @@ class plane_COBOT:
         self.Link_4.plot(ax, **kwargs)
         self.Link_5.plot(ax, **kwargs)
 
-    def PGI(self, des_pose=[2,0,-np.pi/4]):
-        des_pose = np.array(des_pose)
-
-
 
 class MatplotlibWidget(QMainWindow):
 
